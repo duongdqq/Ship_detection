@@ -312,15 +312,16 @@ netMain = None
 metaMain = None
 altNames = None
 
-
-def annota(object_current):
-    with open(current_file.replace(".jpg","")+".txt", 'w') as f:
-        for item in object_current:
+# Modify
+def annota(object):
+    with open(current_file.replace(".jpg","")+".txt", 'a') as f:
+        for item in object:
             f.write("%s " % item)
+        f.write("\n")
     f.close()
 
 
-def performDetect(imagePath="data/ship.jpg", thresh= 0.25, configPath = "./cfg/yolov3.cfg", weightPath = "yolov3.weights", metaPath= "./cfg/coco.data", showImage= True, makeImageOnly = False, initOnly= False):
+def performDetect(imagePath="data/ship.jpg", thresh= 0.01, configPath = "./cfg/yolov3.cfg", weightPath = "yolov3.weights", metaPath= "./cfg/coco.data", showImage= True, makeImageOnly = False, initOnly= False):
     """
     Convenience function to handle the detection and returns of objects.
 
@@ -368,6 +369,7 @@ def performDetect(imagePath="data/ship.jpg", thresh= 0.25, configPath = "./cfg/y
         }
     """
     # Import the global variables. This lets us instance Darknet once, then just call performDetect() again without instancing again
+    folder = '/home/pcu/duong/darknet/data/ship1/exam/'
     global metaMain, netMain, altNames #pylint: disable=W0603
     assert 0 < thresh < 1, "Threshold should be a float between zero and one (non-inclusive)"
     if not os.path.exists(configPath):
@@ -424,15 +426,16 @@ def performDetect(imagePath="data/ship.jpg", thresh= 0.25, configPath = "./cfg/y
                 imcaption.append(pstring)
                 print(pstring)
                 bounds = detection[2]
-                print("bounds=",bounds)
+                # print("bounds=",bounds)
                 shape = image.shape
-                print("shape=", shape)
-                if detection[1] > 0.25:
+                # print("shape=", shape)
+                if detection[1] > 0.01:
                     object = [1, round(bounds[0]/shape[1], 6), round(bounds[1]/shape[0], 6),
                               round(bounds[2]/shape[1], 6), round(bounds[3]/shape[0], 6)]
                 else:
                     object = [0, bounds[0] / shape[1], bounds[1] / shape[0], bounds[2] / shape[1], bounds[3] / shape[0]]
-                print("object=", object)
+                print("object =", object)
+                annota(object)
                 # x = shape[1]
                 # xExtent = int(x * bounds[2] / 100)
                 # y = shape[0]
@@ -461,8 +464,7 @@ def performDetect(imagePath="data/ship.jpg", thresh= 0.25, configPath = "./cfg/y
                 draw.set_color(image, (rr4, cc4), boxColor, alpha= 0.8)
                 draw.set_color(image, (rr5, cc5), boxColor, alpha= 0.8)
                 # Modify
-                return object
-
+            #annota(object)
 
             if not makeImageOnly:
                 io.imshow(image)
@@ -478,4 +480,19 @@ def performDetect(imagePath="data/ship.jpg", thresh= 0.25, configPath = "./cfg/y
 
 
 if __name__ == "__main__":
-    performDetect()
+    folder = '/home/pcu/duong/darknet/data/ship1/exam/'
+    images = []
+    for filename in os.listdir(folder):
+        try:
+            img = mpimg.imread(os.path.join(folder, filename))
+            if img is not None:
+                images.append(img)
+                print(filename)
+        except:
+            print('Cant import ' + filename)
+        current_file = str(folder + filename)
+        # performDetect(current_file)
+        object_current = performDetect(current_file)
+        # annota(object_current)
+    # images = np.asarray(images)
+
