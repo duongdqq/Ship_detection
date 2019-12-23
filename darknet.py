@@ -30,8 +30,6 @@ Windows Python 2.7 version: https://github.com/AlexeyAB/darknet/blob/fc496d52bf2
 from ctypes import *
 import math
 import random
-import os
-
 import cv2
 import os, sys
 import argparse
@@ -39,7 +37,9 @@ import glob
 import matplotlib.image as mpimg
 import numpy as np
 import os.path
-
+from PIL import Image
+import PIL
+from matplotlib import pyplot as plt
 
 def sample(probs):
     s = sum(probs)
@@ -312,16 +312,23 @@ netMain = None
 metaMain = None
 altNames = None
 
-# Modify
+
 def annota(object):
-    with open(current_file.replace(".jpg","")+".txt", 'a') as f:
-        for item in object:
-            f.write("%s " % item)
-        f.write("\n")
+    with open(current_file.replace(".jpg","")+".txt", 'a+') as f:
+        if object == None:
+            open(current_file.replace(".jpg","")+".txt", 'a+').close()
+        else:
+            for item in object:
+               f.write("%s " % item)
+            f.write("\n")
     f.close()
 
 
-def performDetect(imagePath="data/ship.jpg", thresh= 0.01, configPath = "./cfg/yolov3.cfg", weightPath = "yolov3.weights", metaPath= "./cfg/coco.data", showImage= True, makeImageOnly = False, initOnly= False):
+# def save_bounding_box(image):
+#     with open(current_file, 'w') as f:
+#         image.save(f)
+
+def performDetect(imagePath, thresh= 0.05, configPath = "./cfg/yolov3.cfg", weightPath = "yolov3.weights", metaPath= "./cfg/coco.data", showImage= True, makeImageOnly = False, initOnly= False):
     """
     Convenience function to handle the detection and returns of objects.
 
@@ -369,7 +376,6 @@ def performDetect(imagePath="data/ship.jpg", thresh= 0.01, configPath = "./cfg/y
         }
     """
     # Import the global variables. This lets us instance Darknet once, then just call performDetect() again without instancing again
-    folder = '/home/pcu/duong/darknet/data/ship1/exam/'
     global metaMain, netMain, altNames #pylint: disable=W0603
     assert 0 < thresh < 1, "Threshold should be a float between zero and one (non-inclusive)"
     if not os.path.exists(configPath):
@@ -416,11 +422,17 @@ def performDetect(imagePath="data/ship.jpg", thresh= 0.01, configPath = "./cfg/y
             from skimage import io, draw
             import numpy as np
             image = io.imread(imagePath)
-            print("*** "+str(len(detections))+" Results, color coded by confidence ***")
             imcaption = []
+            count = 0
+            if detections == []:
+                annota(None)
             for detection in detections:
                 label = detection[0]
-                print("detection=", detection)
+                if label != 'boat':
+                    annota(None)
+                    continue
+                count += 1
+                print("detection =", detection)
                 confidence = detection[1]
                 pstring = label+": "+str(np.rint(100 * confidence))+"%"
                 imcaption.append(pstring)
@@ -429,7 +441,8 @@ def performDetect(imagePath="data/ship.jpg", thresh= 0.01, configPath = "./cfg/y
                 # print("bounds=",bounds)
                 shape = image.shape
                 # print("shape=", shape)
-                if detection[1] > 0.01:
+                if detection[1] > 0.05:
+                    global object
                     object = [1, round(bounds[0]/shape[1], 6), round(bounds[1]/shape[0], 6),
                               round(bounds[2]/shape[1], 6), round(bounds[3]/shape[0], 6)]
                 else:
@@ -463,36 +476,38 @@ def performDetect(imagePath="data/ship.jpg", thresh= 0.01, configPath = "./cfg/y
                 draw.set_color(image, (rr3, cc3), boxColor, alpha= 0.8)
                 draw.set_color(image, (rr4, cc4), boxColor, alpha= 0.8)
                 draw.set_color(image, (rr5, cc5), boxColor, alpha= 0.8)
-                # Modify
-            #annota(object)
-
+            print("*** " + str(len(detections)) + " Object ***")
+            print("*** " + str(count) + " Boat ***" + "\n\n")
             if not makeImageOnly:
                 io.imshow(image)
                 io.show()
+                io.imsave(current_file, image)
             detections = {
                 "detections": detections,
                 "image": image,
                 "caption": "\n<br/>".join(imcaption)
             }
+
         except Exception as e:
             print("Unable to show image: "+str(e))
     return object
 
 
+
 if __name__ == "__main__":
     folder = '/home/pcu/duong/darknet/data/ship1/exam/'
     images = []
+    index_image = 0
     for filename in os.listdir(folder):
         try:
+            index_image += 1
             img = mpimg.imread(os.path.join(folder, filename))
             if img is not None:
                 images.append(img)
-                print(filename)
+                print(index_image, '---', filename)
         except:
             print('Cant import ' + filename)
         current_file = str(folder + filename)
-        # performDetect(current_file)
         object_current = performDetect(current_file)
-        # annota(object_current)
     # images = np.asarray(images)
 
