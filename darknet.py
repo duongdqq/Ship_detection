@@ -324,10 +324,6 @@ def annota(object):
     f.close()
 
 
-# def save_bounding_box(image):
-#     with open(current_file, 'w') as f:
-#         image.save(f)
-
 def performDetect(imagePath, thresh= 0.05, configPath = "./cfg/yolov3.cfg", weightPath = "yolov3.weights", metaPath= "./cfg/coco.data", showImage= True, makeImageOnly = False, initOnly= False):
     """
     Convenience function to handle the detection and returns of objects.
@@ -478,24 +474,22 @@ def performDetect(imagePath, thresh= 0.05, configPath = "./cfg/yolov3.cfg", weig
                 draw.set_color(image, (rr5, cc5), boxColor, alpha= 0.8)
             print("*** " + str(len(detections)) + " Object ***")
             print("*** " + str(count) + " Boat ***" + "\n\n")
-            if not makeImageOnly:
-                io.imshow(image)
-                io.show()
-                io.imsave(current_file, image)
-            detections = {
-                "detections": detections,
-                "image": image,
-                "caption": "\n<br/>".join(imcaption)
-            }
+            # if not makeImageOnly:
+            #     io.imshow(image)
+            #     io.show()
+            # detections = {
+            #     "detections": detections,
+            #     "image": image,
+            #     "caption": "\n<br/>".join(imcaption)
+            # }
 
         except Exception as e:
             print("Unable to show image: "+str(e))
     return object
 
 
-
 if __name__ == "__main__":
-    folder = '/home/pcu/duong/darknet/data/ship1/exam/'
+    folder = '/home/pcu/duong/darknet/data/ship1/Combination/'
     images = []
     index_image = 0
     for filename in os.listdir(folder):
