@@ -26,7 +26,7 @@ Windows Python 2.7 version: https://github.com/AlexeyAB/darknet/blob/fc496d52bf2
 @author: Philip Kahn
 @date: 20180503
 """
-#pylint: disable=R, W0401, W0614, W0703
+# pylint: disable=R, W0401, W0614, W0703
 from ctypes import *
 import math
 import random
@@ -85,9 +85,9 @@ class METADATA(Structure):
 
 
 
-lib = CDLL("/home/pcu/duong/darknet/libdarknet.so", RTLD_GLOBAL)
+lib = CDLL("/home/tom/duong/darknet/libdarknet.so", RTLD_GLOBAL)
 # lib = CDLL("libdarknet.so", RTLD_GLOBAL)
-#lib = CDLL(os.path.join(os.getcwd(), "libdarknet.so"), RTLD_GLOBAL)
+# lib = CDLL(os.path.join(os.getcwd(), "libdarknet.so"), RTLD_GLOBAL)
 hasGPU = True
 if os.name == "nt":
     cwd = os.path.dirname(__file__)
@@ -256,24 +256,26 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45, debug= False):
     if debug: print("freed image")
     return ret
 
+
 def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45, debug= False):
-    #import cv2
-    #custom_image_bgr = cv2.imread(image) # use: detect(,,imagePath,)
-    #custom_image = cv2.cvtColor(custom_image_bgr, cv2.COLOR_BGR2RGB)
-    #custom_image = cv2.resize(custom_image,(lib.network_width(net), lib.network_height(net)), interpolation = cv2.INTER_LINEAR)
-    #import scipy.misc
-    #custom_image = scipy.misc.imread(image)
-    #im, arr = array_to_image(custom_image)		# you should comment line below: free_image(im)
+    # import cv2
+    # custom_image_bgr = cv2.imread(image) # use: detect(,,imagePath,)
+    # custom_image = cv2.cvtColor(custom_image_bgr, cv2.COLOR_BGR2RGB)
+    # custom_image = cv2.resize(custom_image,(lib.network_width(net), lib.network_height(net)),
+    # interpolation = cv2.INTER_LINEAR)
+    # import scipy.misc
+    # custom_image = scipy.misc.imread(image)
+    # im, arr = array_to_image(custom_image)		# you should comment line below: free_image(im)
     num = c_int(0)
     if debug: print("Assigned num")
     pnum = pointer(num)
     if debug: print("Assigned pnum")
     predict_image(net, im)
     letter_box = 0
-    #predict_image_letterbox(net, im)
-    #letter_box = 1
+    # predict_image_letterbox(net, im)
+    # letter_box = 1
     if debug: print("did prediction")
-    #dets = get_network_boxes(net, custom_image_bgr.shape[1], custom_image_bgr.shape[0], thresh, hier_thresh, None, 0, pnum, letter_box) # OpenCV
+    # dets = get_network_boxes(net, custom_image_bgr.shape[1], custom_image_bgr.shape[0], thresh, hier_thresh, None, 0, pnum, letter_box) # OpenCV
     dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, None, 0, pnum, letter_box)
     if debug: print("Got dets")
     num = pnum[0]
@@ -324,7 +326,8 @@ def annota(object):
     f.close()
 
 
-def performDetect(imagePath, thresh= 0.05, configPath = "./cfg/yolov3.cfg", weightPath = "yolov3.weights", metaPath= "./cfg/coco.data", showImage= True, makeImageOnly = False, initOnly= False):
+def performDetect(imagePath, thresh= 0.15, configPath = "yolo-obj.cfg", weightPath = "yolo-obj_final.weights",
+                  metaPath= "obj.data", showImage= True, makeImageOnly = False, initOnly= False):
     """
     Convenience function to handle the detection and returns of objects.
 
@@ -371,7 +374,8 @@ def performDetect(imagePath, thresh= 0.05, configPath = "./cfg/yolov3.cfg", weig
             "caption": an image caption
         }
     """
-    # Import the global variables. This lets us instance Darknet once, then just call performDetect() again without instancing again
+    # Import the global variables. This lets us instance Darknet once,
+    # then just call performDetect() again without instancing again
     global metaMain, netMain, altNames #pylint: disable=W0603
     assert 0 < thresh < 1, "Threshold should be a float between zero and one (non-inclusive)"
     if not os.path.exists(configPath):
@@ -411,7 +415,7 @@ def performDetect(imagePath, thresh= 0.05, configPath = "./cfg/yolov3.cfg", weig
     if not os.path.exists(imagePath):
         raise ValueError("Invalid image path `"+os.path.abspath(imagePath)+"`")
     # Do the detection
-    #detections = detect(netMain, metaMain, imagePath, thresh)	# if is used cv2.imread(image)
+    # detections = detect(netMain, metaMain, imagePath, thresh)	# if is used cv2.imread(image)
     detections = detect(netMain, metaMain, imagePath.encode("ascii"), thresh)
     if showImage:
         try:
@@ -428,22 +432,22 @@ def performDetect(imagePath, thresh= 0.05, configPath = "./cfg/yolov3.cfg", weig
                     annota(None)
                     continue
                 count += 1
-                print("detection =", detection)
+                # print("detection =", detection)
                 confidence = detection[1]
-                pstring = label+": "+str(np.rint(100 * confidence))+"%"
-                imcaption.append(pstring)
-                print(pstring)
+                # pstring = label+": "+str(np.rint(100 * confidence))+"%"
+                # imcaption.append(pstring)
+                # print(pstring)
                 bounds = detection[2]
                 # print("bounds=",bounds)
                 shape = image.shape
                 # print("shape=", shape)
                 if detection[1] > 0.05:
                     global object
-                    object = [1, round(bounds[0]/shape[1], 6), round(bounds[1]/shape[0], 6),
+                    object = [0, round(bounds[0]/shape[1], 6), round(bounds[1]/shape[0], 6),
                               round(bounds[2]/shape[1], 6), round(bounds[3]/shape[0], 6)]
                 else:
-                    object = [0, bounds[0] / shape[1], bounds[1] / shape[0], bounds[2] / shape[1], bounds[3] / shape[0]]
-                print("object =", object)
+                    object = [1, bounds[0] / shape[1], bounds[1] / shape[0], bounds[2] / shape[1], bounds[3] / shape[0]]
+                # print("object =", object)
                 annota(object)
                 # x = shape[1]
                 # xExtent = int(x * bounds[2] / 100)
@@ -472,8 +476,8 @@ def performDetect(imagePath, thresh= 0.05, configPath = "./cfg/yolov3.cfg", weig
                 draw.set_color(image, (rr3, cc3), boxColor, alpha= 0.8)
                 draw.set_color(image, (rr4, cc4), boxColor, alpha= 0.8)
                 draw.set_color(image, (rr5, cc5), boxColor, alpha= 0.8)
-            print("*** " + str(len(detections)) + " Object ***")
-            print("*** " + str(count) + " Boat ***" + "\n\n")
+            # print("*** " + str(len(detections)) + " Object ***")
+            # print("*** " + str(count) + " Boat ***" + "\n\n")
             # if not makeImageOnly:
             #     io.imshow(image)
             #     io.show()
@@ -489,7 +493,7 @@ def performDetect(imagePath, thresh= 0.05, configPath = "./cfg/yolov3.cfg", weig
 
 
 if __name__ == "__main__":
-    folder = '/home/pcu/duong/darknet/data/ship1/Combination/'
+    folder = '/home/tom/duong/darknet/data/seaships/jpg3000_1/'
     images = []
     index_image = 0
     for filename in os.listdir(folder):
@@ -502,6 +506,6 @@ if __name__ == "__main__":
         except:
             print('Cant import ' + filename)
         current_file = str(folder + filename)
-        object_current = performDetect(current_file)
+        performDetect(current_file)
     # images = np.asarray(images)
 
