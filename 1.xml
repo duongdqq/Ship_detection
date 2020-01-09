@@ -1,0 +1,26 @@
+<annotation>
+    <folder>all_images</folder>
+    <filename>0.jpg</filename>
+    <path>/home/vishnu/Documents/all_images/0.jpg</path>
+    <source>
+        <database>Unknown</database>
+    </source>
+    <size>
+        <width>4250</width>
+        <height>5500</height>
+        <depth>1</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>word</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <bndbox>
+            <xmin>308</xmin>
+            <ymin>45</ymin>
+            <xmax>502</xmax>
+            <ymax>162</ymax>
+        </bndbox>
+    </object>
+</annotation>
