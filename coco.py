@@ -1,5 +1,6 @@
 __author__ = 'tylin'
 __version__ = '2.0'
+
 # Interface for accessing the Microsoft COCO dataset.
 
 # Microsoft COCO is a large image dataset designed for object detection,
@@ -43,7 +44,7 @@ __version__ = '2.0'
 # Data, paper, and tutorials available at:  http://mscoco.org/
 # Code written by Piotr Dollar and Tsung-Yi Lin, 2014.
 # Licensed under the Simplified BSD License [see bsd.txt]
-
+import shutil
 from ctypes import *
 import json
 import time
@@ -57,12 +58,15 @@ from PythonAPI.pycocotools import _mask as maskUtils
 import os
 from collections import defaultdict
 import sys
+
 PYTHON_VERSION = sys.version_info[0]
 if PYTHON_VERSION == 2:
     from urllib import urlretrieve
 elif PYTHON_VERSION == 3:
     from urllib.request import urlretrieve
 import requests
+import pandas as pd
+
 
 def _isArrayLike(obj):
     return hasattr(obj, '__iter__') and hasattr(obj, '__len__')
@@ -77,14 +81,14 @@ class COCO:
         :return:
         """
         # load dataset
-        self.dataset,self.anns,self.cats,self.imgs = dict(),dict(),dict(),dict()
+        self.dataset, self.anns, self.cats, self.imgs = dict(), dict(), dict(), dict()
         self.imgToAnns, self.catToImgs = defaultdict(list), defaultdict(list)
         if not annotation_file == None:
             print('loading annotations into memory...')
             tic = time.time()
             dataset = json.load(open(annotation_file, 'r'))
-            assert type(dataset)==dict, 'annotation file format {} not supported'.format(type(dataset))
-            print('Done (t={:0.2f}s)'.format(time.time()- tic))
+            assert type(dataset) == dict, 'annotation file format {} not supported'.format(type(dataset))
+            print('Done (t={:0.2f}s)'.format(time.time() - tic))
             self.dataset = dataset
             self.createIndex()
 
@@ -92,7 +96,7 @@ class COCO:
         # create index
         print('creating index...')
         anns, cats, imgs = {}, {}, {}
-        imgToAnns,catToImgs = defaultdict(list),defaultdict(list)
+        imgToAnns, catToImgs = defaultdict(list), defaultdict(list)
         if 'annotations' in self.dataset:
             for ann in self.dataset['annotations']:
                 imgToAnns[ann['image_id']].append(ann)
@@ -147,8 +151,9 @@ class COCO:
                 anns = list(itertools.chain.from_iterable(lists))
             else:
                 anns = self.dataset['annotations']
-            anns = anns if len(catIds)  == 0 else [ann for ann in anns if ann['category_id'] in catIds]
-            anns = anns if len(areaRng) == 0 else [ann for ann in anns if ann['area'] > areaRng[0] and ann['area'] < areaRng[1]]
+            anns = anns if len(catIds) == 0 else [ann for ann in anns if ann['category_id'] in catIds]
+            anns = anns if len(areaRng) == 0 else [ann for ann in anns if
+                                                   ann['area'] > areaRng[0] and ann['area'] < areaRng[1]]
         if not iscrowd == None:
             ids = [ann['id'] for ann in anns if ann['iscrowd'] == iscrowd]
         else:
@@ -171,9 +176,9 @@ class COCO:
             cats = self.dataset['categories']
         else:
             cats = self.dataset['categories']
-            cats = cats if len(catNms) == 0 else [cat for cat in cats if cat['name']          in catNms]
+            cats = cats if len(catNms) == 0 else [cat for cat in cats if cat['name'] in catNms]
             cats = cats if len(supNms) == 0 else [cat for cat in cats if cat['supercategory'] in supNms]
-            cats = cats if len(catIds) == 0 else [cat for cat in cats if cat['id']            in catIds]
+            cats = cats if len(catIds) == 0 else [cat for cat in cats if cat['id'] in catIds]
         ids = [cat['id'] for cat in cats]
         return ids
 
@@ -251,12 +256,12 @@ class COCO:
             polygons = []
             color = []
             for ann in anns:
-                c = (np.random.random((1, 3))*0.6+0.4).tolist()[0]
+                c = (np.random.random((1, 3)) * 0.6 + 0.4).tolist()[0]
                 if 'segmentation' in ann:
                     if type(ann['segmentation']) == list:
                         # polygon
                         for seg in ann['segmentation']:
-                            poly = np.array(seg).reshape((int(len(seg)/2), 2))
+                            poly = np.array(seg).reshape((int(len(seg) / 2), 2))
                             polygons.append(Polygon(poly))
                             color.append(c)
                     else:
@@ -267,26 +272,28 @@ class COCO:
                         else:
                             rle = [ann['segmentation']]
                         m = maskUtils.decode(rle)
-                        img = np.ones( (m.shape[0], m.shape[1], 3) )
+                        img = np.ones((m.shape[0], m.shape[1], 3))
                         if ann['iscrowd'] == 1:
-                            color_mask = np.array([2.0,166.0,101.0])/255
+                            color_mask = np.array([2.0, 166.0, 101.0]) / 255
                         if ann['iscrowd'] == 0:
                             color_mask = np.random.random((1, 3)).tolist()[0]
                         for i in range(3):
-                            img[:,:,i] = color_mask[i]
-                        ax.imshow(np.dstack( (img, m*0.5) ))
+                            img[:, :, i] = color_mask[i]
+                        ax.imshow(np.dstack((img, m * 0.5)))
                 if 'keypoints' in ann and type(ann['keypoints']) == list:
                     # turn skeleton into zero-based index
-                    sks = np.array(self.loadCats(ann['category_id'])[0]['skeleton'])-1
+                    sks = np.array(self.loadCats(ann['category_id'])[0]['skeleton']) - 1
                     kp = np.array(ann['keypoints'])
                     x = kp[0::3]
                     y = kp[1::3]
                     v = kp[2::3]
                     for sk in sks:
-                        if np.all(v[sk]>0):
-                            plt.plot(x[sk],y[sk], linewidth=3, color=c)
-                    plt.plot(x[v>0], y[v>0],'o',markersize=8, markerfacecolor=c, markeredgecolor='k',markeredgewidth=2)
-                    plt.plot(x[v>1], y[v>1],'o',markersize=8, markerfacecolor=c, markeredgecolor=c, markeredgewidth=2)
+                        if np.all(v[sk] > 0):
+                            plt.plot(x[sk], y[sk], linewidth=3, color=c)
+                    plt.plot(x[v > 0], y[v > 0], 'o', markersize=8, markerfacecolor=c, markeredgecolor='k',
+                             markeredgewidth=2)
+                    plt.plot(x[v > 1], y[v > 1], 'o', markersize=8, markerfacecolor=c, markeredgecolor=c,
+                             markeredgewidth=2)
             p = PatchCollection(polygons, facecolor=color, linewidths=0, alpha=0.4)
             ax.add_collection(p)
             p = PatchCollection(polygons, facecolor='none', edgecolors=color, linewidths=2)
@@ -315,21 +322,21 @@ class COCO:
         assert type(anns) == list, 'results in not an array of objects'
         annsImgIds = [ann['image_id'] for ann in anns]
         assert set(annsImgIds) == (set(annsImgIds) & set(self.getImgIds())), \
-               'Results do not correspond to current coco set'
+            'Results do not correspond to current coco set'
         if 'caption' in anns[0]:
             imgIds = set([img['id'] for img in res.dataset['images']]) & set([ann['image_id'] for ann in anns])
             res.dataset['images'] = [img for img in res.dataset['images'] if img['id'] in imgIds]
             for id, ann in enumerate(anns):
-                ann['id'] = id+1
+                ann['id'] = id + 1
         elif 'bbox' in anns[0] and not anns[0]['bbox'] == []:
             res.dataset['categories'] = copy.deepcopy(self.dataset['categories'])
             for id, ann in enumerate(anns):
                 bb = ann['bbox']
-                x1, x2, y1, y2 = [bb[0], bb[0]+bb[2], bb[1], bb[1]+bb[3]]
+                x1, x2, y1, y2 = [bb[0], bb[0] + bb[2], bb[1], bb[1] + bb[3]]
                 if not 'segmentation' in ann:
                     ann['segmentation'] = [[x1, y1, x1, y2, x2, y2, x2, y1]]
-                ann['area'] = bb[2]*bb[3]
-                ann['id'] = id+1
+                ann['area'] = bb[2] * bb[3]
+                ann['id'] = id + 1
                 ann['iscrowd'] = 0
         elif 'segmentation' in anns[0]:
             res.dataset['categories'] = copy.deepcopy(self.dataset['categories'])
@@ -338,7 +345,7 @@ class COCO:
                 ann['area'] = maskUtils.area(ann['segmentation'])
                 if not 'bbox' in ann:
                     ann['bbox'] = maskUtils.toBbox(ann['segmentation'])
-                ann['id'] = id+1
+                ann['id'] = id + 1
                 ann['iscrowd'] = 0
         elif 'keypoints' in anns[0]:
             res.dataset['categories'] = copy.deepcopy(self.dataset['categories'])
@@ -346,17 +353,17 @@ class COCO:
                 s = ann['keypoints']
                 x = s[0::3]
                 y = s[1::3]
-                x0,x1,y0,y1 = np.min(x), np.max(x), np.min(y), np.max(y)
-                ann['area'] = (x1-x0)*(y1-y0)
+                x0, x1, y0, y1 = np.min(x), np.max(x), np.min(y), np.max(y)
+                ann['area'] = (x1 - x0) * (y1 - y0)
                 ann['id'] = id + 1
-                ann['bbox'] = [x0,y0,x1-x0,y1-y0]
-        print('DONE (t={:0.2f}s)'.format(time.time()- tic))
+                ann['bbox'] = [x0, y0, x1 - x0, y1 - y0]
+        print('DONE (t={:0.2f}s)'.format(time.time() - tic))
 
         res.dataset['annotations'] = anns
         res.createIndex()
         return res
 
-    def download(self, tarDir = None, imgIds = [] ):
+    def download(self, tarDir=None, imgIds=[]):
         '''
         Download COCO images from mscoco.org server.
         :param tarDir (str): COCO results directory name
@@ -378,7 +385,7 @@ class COCO:
             fname = os.path.join(tarDir, img['file_name'])
             if not os.path.exists(fname):
                 urlretrieve(img['coco_url'], fname)
-            print('downloaded {}/{} images (t={:0.1f}s)'.format(i, N, time.time()- tic))
+            print('downloaded {}/{} images (t={:0.1f}s)'.format(i, N, time.time() - tic))
 
     def loadNumpyAnnotations(self, data):
         """
@@ -387,20 +394,20 @@ class COCO:
         :return: annotations (python nested list)
         """
         print('Converting ndarray to lists...')
-        assert(type(data) == np.ndarray)
+        assert (type(data) == np.ndarray)
         print(data.shape)
-        assert(data.shape[1] == 7)
+        assert (data.shape[1] == 7)
         N = data.shape[0]
         ann = []
         for i in range(N):
             if i % 1000000 == 0:
-                print('{}/{}'.format(i,N))
+                print('{}/{}'.format(i, N))
             ann += [{
-                'image_id'  : int(data[i, 0]),
-                'bbox'  : [ data[i, 1], data[i, 2], data[i, 3], data[i, 4] ],
-                'score' : data[i, 5],
+                'image_id': int(data[i, 0]),
+                'bbox': [data[i, 1], data[i, 2], data[i, 3], data[i, 4]],
+                'score': data[i, 5],
                 'category_id': int(data[i, 6]),
-                }]
+            }]
         return ann
 
     def annToRLE(self, ann):
@@ -432,22 +439,74 @@ class COCO:
         rle = self.annToRLE(ann)
         m = maskUtils.decode(rle)
         return m
+def create_data_subset(folder_name, category):
+    # note this only refers to  the training set and not the validation set
+    coco = COCO('/media/veec20/Data/duongdq/datasets/cocoapi/datasets/annotations_trainval2017/annotations/instances_train2017.json')
+
+    # note this only refers to the captions of the training set and not the validation set
+    caps = COCO('/media/veec20/Data/duongdq/datasets/cocoapi/datasets/annotations_trainval2017/annotations/captions_train2017.json')
+
+    categories = coco.loadCats(coco.getCatIds())
+    names = [cat['name'] for cat in categories]
+
+    print("Available categories: ")
+    for index, n in enumerate(names):
+        print(index, n)
+
+    category_ids = coco.getCatIds(catNms=[category])
+    image_ids = coco.getImgIds(catIds=category_ids)
+    images = coco.loadImgs(image_ids)
+    annIds = caps.getAnnIds(imgIds=image_ids)
+    annotations = caps.loadAnns(annIds)
+
+    # Split the annotations every 5 captions since there are 5 captions for each image
+    annotations = [annotations[x:x + 5] for x in range(0, len(annotations), 5)]
+
+    # Create empty dataframe with two columns for the image file name and the corresponding captions
+    df = pd.DataFrame(columns=['image_id', 'caption'])
+
+    # Create folder in for the images of the selected category
+    os.mkdir(folder_name)
+
+    # Create map for image id (key) to captions (values)
+    captions_dict = {}
+    for i, n in enumerate(annotations):
+        captions_dict[annotations[i][0]['image_id']] = annotations[i]
+
+    boat_file_names = []
+    for img in images:
+        boat_file_names.append(img['file_name'])
+        for entry in captions_dict[img['id']]:
+            df.loc[len(df)] = [img['file_name'], entry['caption']]
+
+    # Convert dataframe to csv file and save to folder
+    df.to_csv(folder_name + "/captions.csv", index=False)
+
+    # Copy all images of given category to new folder
+    for filename in os.listdir('/media/veec20/Data/duongdq/datasets/cocoapi/datasets/train2017/'):
+        if filename in boat_file_names:
+            shutil.copy(os.path.join('/media/veec20/Data/duongdq/datasets/cocoapi/datasets/train2017', filename), folder_name)
+
+    print('Done creating data subset with images....')
+
 
 
 if __name__ == "__main__":
-    coco = COCO('/home/pcu/duong/cocoapi/annotations_trainval2017/annotations/instances_val2017.json')
-    cats = coco.loadCats(coco.getCatIds())
-    nms = [cat['name'] for cat in cats]
-    print('COCO categories: \n{}\n'.format(' '.join(nms)))
-
-    catIds = coco.getCatIds(catNms=['boat'])
-    imgIds = coco.getImgIds(catIds=catIds)
-    images = coco.loadImgs(imgIds)
-    print("imgIds: ", imgIds)
-    print("images: ", images)
-
-    for im in images:
-        print("im: ", im)
-        img_data = requests.get(im['coco_url']).content
-        with open('/home/pcu/duong/cocoapi/annotations_trainval2017/annotations/Downloaded_data/' + im['file_name'], 'ab+') as handler:
-            handler.write(img_data)
+    # coco = COCO('/home/pcu/duong/cocoapi/annotations_trainval2017/annotations/instances_val2017.json')
+    # cats = coco.loadCats(coco.getCatIds())
+    # nms = [cat['name'] for cat in cats]
+    # print('COCO categories: \n{}\n'.format(' '.join(nms)))
+    #
+    # catIds = coco.getCatIds(catNms=['boat'])
+    # imgIds = coco.getImgIds(catIds=catIds)
+    # images = coco.loadImgs(imgIds)
+    # print("imgIds: ", imgIds)
+    # print("images: ", images)
+    #
+    # for im in images:
+    #     print("im: ", im)
+    #     img_data = requests.get(im['coco_url']).content
+    #     with open('/home/pcu/duong/cocoapi/annotations_trainval2017/annotations/Downloaded_data/' + im['file_name']
+    #     , 'ab+') as handler:
+    #         handler.write(img_data)
+    create_data_subset(folder_name='boat', category='boat')
