@@ -1,1 +1,9 @@
-
+# Các thư mục và mục đích sử dụng
+* darknet.py: chạy file darknet dùng cho mục đích kiểm tra
+* create_name.py: tạo tên đường dẫn của thư mục để đưa vào file train.txt, valid.txt và test.txt
+* change_file_type.py: chuyển annotation của ảnh ( được gán nhãn bởi bài báo ) từ .xml sang .txt
+* sample.xml: file xml mẫu
+* coco.py: file được chỉnh sửa từ COCO, mục đích để lấy ảnh chứa class yêu cầu - Boat
+# Quá trình hình thành đề tài
+## CN 23/2/2020
+*  
