@@ -11,7 +11,7 @@ training set 8000
 * obj 1000 + 1000 + 2000
 * noobj 4000 
 valid set 
-* obj 3000
+* obj 3192
 * noobj 2500
 detects_count = 11941 
 unuque_truth_count = 4603
@@ -26,7 +26,7 @@ training set 8000
 * obj 1000 + 1000 + 2000
 * noobj 4000 
 valid set 
-* obj 3000
+* obj 3192
 detects_count = 5578
 unuque_truth_count = 3802
 ap = 87.68
