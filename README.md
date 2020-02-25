@@ -20,3 +20,18 @@ TP 2912
 FP 789
 FN 1691
 average IoU 59.66
+---
+dataset
+training set 8000
+* obj 1000 + 1000 + 2000
+* noobj 4000 
+valid set 
+* obj 3000
+detects_count = 5578
+unuque_truth_count = 3802
+ap = 87.68
+TP 2958
+FP 250
+FN 844
+average IoU 70.97
+---
