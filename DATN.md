@@ -1,3 +1,9 @@
+# Dự kiến
+* Bắt đầu ghi chép 23/2/2020
+* Dự kiến hoàn thiện phần Detection 1/3/2020
+* Dự kiến hoàn thiện phần Classification 1/4/2020
+* Dự kiến hoàn thiện phần thiết kế hệ thống Camera và phần cứng 1/4/2020
+* Dự kiến hoàn kiện Đồ án tốt nghiệp 2020 15/4/2020
 # Phát hiện, phân loại và bắt bám tàu sử dụng thuật toán xử lý hình ảnh và trí tuệ nhân tạo
 ## Danh mục viết tắt
 ## Mục lục
