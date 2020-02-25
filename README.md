@@ -4,11 +4,19 @@
 * change_file_type.py: chuyển annotation của ảnh ( được gán nhãn bởi bài báo ) từ .xml sang .txt
 * sample.xml: file xml mẫu
 * coco.py: file được chỉnh sửa từ COCO, mục đích để lấy ảnh chứa class yêu cầu - Boat
-# Dự kiến
-* Bắt đầu ghi chép 23/2/2020
-* Dự kiến hoàn thiện phần Detection 1/3/2020
-* Dự kiến hoàn thiện phần Classification 1/4/2020
-* Dự kiến hoàn thiện phần thiết kế hệ thống Camera và phần cứng 1/4/2020
-* Dự kiến hoàn kiện Đồ án tốt nghiệp 2020 15/4/2020
 # Quá trình hình thành đề tài
 ## T3 25/2/2020 
+dataset
+training set 8000
+* obj 1000 + 1000 + 2000
+* noobj 4000 
+valid set 
+* obj 3000
+* noobj 2500
+detects_count = 11941 
+unuque_truth_count = 4603
+ap = 69.15
+TP 2912
+FP 789
+FN 1691
+average IoU 59.66
