@@ -7,12 +7,12 @@
 # Quá trình hình thành đề tài
 ## T3 25/2/2020 
 dataset
-training set 8000
+* training set 8000
 * obj 1000 + 1000 + 2000
 * noobj 4000 
-valid set 
+* valid set 
 * obj 3192
-* noobj 2500
+* noobj 2556
 detects_count = 11941 
 unuque_truth_count = 4603
 ap = 69.15
@@ -22,10 +22,10 @@ FN 1691
 average IoU 59.66
 ---
 dataset
-training set 8000
+* training set 8000
 * obj 1000 + 1000 + 2000
 * noobj 4000 
-valid set 
+* valid set 
 * obj 3192
 detects_count = 5578
 unuque_truth_count = 3802
@@ -34,4 +34,18 @@ TP 2958
 FP 250
 FN 844
 average IoU 70.97
+---
+dataset
+* training set 8000
+* obj 1000 + 1000 + 2000
+* noobj 4000 
+* valid set 
+* noobj 2556
+detects_count = 5223 
+unuque_truth_count = 0
+ap = 0
+TP 0
+FP 492
+FN 0
+average IoU 0
 ---
