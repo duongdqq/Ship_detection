@@ -4,7 +4,7 @@
 * change_file_type.py: chuyển annotation của ảnh ( được gán nhãn bởi bài báo ) từ .xml sang .txt
 * sample.xml: file xml mẫu
 * coco.py: file được chỉnh sửa từ COCO, mục đích để lấy ảnh chứa class yêu cầu - Boat
-# Quá trình hình thành đề tài
+# Theo dõi
 ## T3 25/2/2020 
 dataset
 * training set 8000
