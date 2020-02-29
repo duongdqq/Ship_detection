@@ -53,7 +53,8 @@
 ---
 28/2
 * Dữ liệu 
-* Bỏ các ảnh dọc, trộn lẫn tập COCO để chia vào Training s
+* Bỏ các ảnh dọc, trộn lẫn tập COCO để chia vào Training set và Test set
+
 | Dataset                | Total         | Training set | Test set   |
 | -----------------------|---------------|--------------|------------|
 | Boat Types Recognition | 1200          | 1000         | 200        |
