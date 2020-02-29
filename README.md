@@ -4,48 +4,41 @@
 * change_file_type.py: chuyển annotation của ảnh ( được gán nhãn bởi bài báo ) từ .xml sang .txt
 * sample.xml: file xml mẫu
 * coco.py: file được chỉnh sửa từ COCO, mục đích để lấy ảnh chứa class yêu cầu - Boat
-# Theo dõi
-## T3 25/2/2020 
-dataset
-* training set 8000
-* obj 1000 + 1000 + 2000
-* noobj 4000 
-* valid set 
-* obj 3192
-* noobj 2556
-detects_count = 11941 
-unuque_truth_count = 4603
-ap = 69.15
-TP 2912
-FP 789
-FN 1691
-average IoU 59.66
+# Kết quả và đánh giá 
 ---
-dataset
-* training set 8000
-* obj 1000 + 1000 + 2000
-* noobj 4000 
-* valid set 
-* obj 3192
-detects_count = 5578
-unuque_truth_count = 3802
-ap = 87.68
-TP 2958
-FP 250
-FN 844
-average IoU 70.97
+25/2
+* Dữ liệu
+
+| Dataset                | Total         | Training set | Test set   |
+| -----------------------|---------------|--------------|------------|
+| Boat Types Recognition | 1362          | 1000         | 150        |
+| Ship Detection         | 7000          | 1000         | 3000       |
+| COCO                   | 8550          | 2000 + 4000  | 0 + 2550   |
+| Project                | 19912         | 8000         | 5700       |
+|                        |               | 4000 + 4000  | 3150 + 2550|
+* Kết quả
+
+| Dataset      | detections_count | unique_truth_count | mAP   | TP    | FP    | FN    | IoU    |
+| -------------|------------------|--------------------|-------|-------|-------|-------|--------|
+| obj + noobj  | 11941            | 4603               | 69.15 | 2912  | 789   | 1691  | 59.66  |
+| obj          | 5578             | 3802               | 87.68 | 2958  | 250   | 844   | 70.97  |
+| noobj        | 5223             | 0                  | 0     | 0     | 492   | 0     | 0      |
+
 ---
-dataset
-* training set 8000
-* obj 1000 + 1000 + 2000
-* noobj 4000 
-* valid set 
-* noobj 2556
-detects_count = 5223 
-unuque_truth_count = 0
-ap = 0
-TP 0
-FP 492
-FN 0
-average IoU 0
----
+26/2
+* Dữ liệu 
+
+| Dataset                | Total         | Training set | Test set   |
+| -----------------------|---------------|--------------|------------|
+| Boat Types Recognition | 1362          | 1000         | 150        |
+| Ship Detection         | 7000          | 1000         | 3000       |
+| COCO                   | 9550          | 3000 + 4000  | 0 + 2550   |
+| Project                | 17912         | 9000         | 5700       |
+|                        |               | 5000 + 4000  | 3150 + 2550|
+* Kết quả
+
+| Dataset      | detections_count | unique_truth_count | mAP   | TP    | FP    | FN    | IoU    |
+| -------------|------------------|--------------------|-------|-------|-------|-------|--------|
+| obj + noobj  | 11941            | 4603               | 69.15 | 2912  | 789   | 1691  | 59.66  |
+| obj          | 5578             | 3802               | 87.68 | 2958  | 250   | 844   | 70.97  |
+| noobj        | 5223             | 0                  | 0     | 0     | 492   | 0     | 0      |
