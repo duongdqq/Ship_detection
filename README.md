@@ -4,8 +4,8 @@
 * change_file_type.py: chuyển annotation của ảnh ( được gán nhãn bởi bài báo ) từ .xml sang .txt
 * sample.xml: file xml mẫu
 * coco.py: file được chỉnh sửa từ COCO, mục đích để lấy ảnh chứa class yêu cầu - Boat
+* get_horizontal_img.py: loại ảnh 
 # Kết quả và đánh giá 
----
 25/2
 * Dữ liệu
 
