@@ -31,6 +31,7 @@
 26/2
 * Dữ liệu 
 * Thêm 1000 ảnh chứa tàu từ tập COCO vào Training set
+
 | Dataset                | Total         | Training set | Test set   |
 | -----------------------|---------------|--------------|------------|
 | Boat Types Recognition | 1362          | 1000         | 150        |
