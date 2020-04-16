@@ -14,12 +14,16 @@ def change_coordination():
             filename.replace('.jpeg', '.jpg')
             filename.replace('.JPG', '.jpg')
         img = cv2.imread(os.path.join(folder, filename))
+        txt_file = filename.replace('.jpg', '.txt')
         if img is not None:
             height, width, chanel = img.shape
         else:
             continue
-        txt_file = filename.replace('.jpg', '.txt')
         f = open(os.path.join(folder, txt_file))
+        if os.stat(folder + txt_file).st_size == 0:
+            shutil.copy(os.path.join(folder, txt_file), directory)
+            shutil.copy(os.path.join(folder, filename), directory)
+            continue
         for line in f.readlines():
             line = line.rstrip('\n')
             # size of original obj
@@ -92,8 +96,8 @@ def save_file(directory, crop, img, filename, x_min_new_img, y_min_new_img, x_ma
         x_max_obj = int(x_center_obj + w_obj / 2)
         y_max_obj = y_center_obj + 180
         # Draw coordination of original obj
-        cv2.rectangle(img, (x_min_obj, y_min_obj), (x_max_obj, y_max_obj), (255, 0, 0), 1)
-        cv2.circle(img, (x_center_obj, y_center_obj), 10, (255, 0, 0), 1)
+        # cv2.rectangle(img, (x_min_obj, y_min_obj), (x_max_obj, y_max_obj), (255, 0, 0), 1)
+        # cv2.circle(img, (x_center_obj, y_center_obj), 10, (255, 0, 0), 1)
         # cv2.imshow('Draw label of original obj', img)
         # cv2.waitKey(0)
 
@@ -101,19 +105,19 @@ def save_file(directory, crop, img, filename, x_min_new_img, y_min_new_img, x_ma
         if x_max_obj <= x_min_new_img:  # Outside left
             x_center_obj_new = 0
             width_obj_new = 0
-        elif x_min_obj < x_min_new_img < x_max_obj < x_max_new_img:  # Inside left
+        elif x_min_obj <= x_min_new_img <= x_max_obj <= x_max_new_img:  # Inside left
             x_center_obj_new = int((x_max_obj - x_min_new_img) / 2)
             width_obj_new = x_max_obj - x_min_new_img
-        elif x_min_new_img < x_min_obj < x_max_obj < x_max_new_img:  # Inside
+        elif x_min_new_img <= x_min_obj <= x_max_obj <= x_max_new_img:  # Inside
             x_center_obj_new = int((x_max_obj - x_min_obj) / 2 + x_min_obj - x_min_new_img)
             width_obj_new = x_max_obj - x_min_obj
-        elif x_min_new_img < x_min_obj < x_max_new_img < x_max_obj:  # Inside right
+        elif x_min_new_img <= x_min_obj <= x_max_new_img <= x_max_obj:  # Inside right
             x_center_obj_new = int((x_max_new_img - x_min_obj) / 2 + x_min_obj - x_min_new_img)
             width_obj_new = x_max_new_img - x_min_obj
         elif x_max_new_img <= x_min_obj:  # Outside right
             x_center_obj_new = 0
             width_obj_new = 0
-        elif x_min_obj < x_min_new_img < x_max_new_img < x_max_obj:  # obj cover new img
+        elif x_min_obj <= x_min_new_img <= x_max_new_img <= x_max_obj:  # obj cover new img
             x_center_obj_new = int((x_max_new_img - x_min_new_img) / 2)
             width_obj_new = x_max_new_img - x_min_new_img
         else:
@@ -122,19 +126,19 @@ def save_file(directory, crop, img, filename, x_min_new_img, y_min_new_img, x_ma
         if y_max_obj <= y_min_new_img:  # Outside top
             y_center_obj_new = 0
             height_obj_new = 0
-        elif y_min_obj < y_min_new_img < y_max_obj < y_max_new_img:  # Inside top
+        elif y_min_obj <= y_min_new_img <= y_max_obj <= y_max_new_img:  # Inside top
             y_center_obj_new = int((y_max_obj - y_min_new_img) / 2)
             height_obj_new = y_max_obj - y_min_new_img
-        elif y_min_new_img < y_min_obj < y_max_obj < y_max_new_img:  # Inside
+        elif y_min_new_img <= y_min_obj <= y_max_obj <= y_max_new_img:  # Inside
             y_center_obj_new = int((y_max_obj - y_min_obj) / 2 + x_min_obj - x_min_new_img)
             height_obj_new = y_max_obj - y_min_obj
-        elif y_min_new_img < y_min_obj < y_max_new_img < y_max_obj:  # Inside bottom
+        elif y_min_new_img <= y_min_obj <= y_max_new_img <= y_max_obj:  # Inside bottom
             y_center_obj_new = int((y_max_new_img - y_min_obj) / 2 + y_min_obj - y_min_new_img)
             height_obj_new = y_max_new_img - y_min_obj
         elif y_max_new_img <= y_min_obj:  # Outside bottom
             y_center_obj_new = 0
             height_obj_new = 0
-        elif y_min_obj < y_min_new_img < y_max_new_img < y_max_obj:  # obj cover new img
+        elif y_min_obj <= y_min_new_img <= y_max_new_img <= y_max_obj:  # obj cover new img 1
             y_center_obj_new = int((y_max_new_img - y_min_new_img) / 2)
             height_obj_new = y_max_new_img - y_min_new_img
         else:
@@ -143,7 +147,7 @@ def save_file(directory, crop, img, filename, x_min_new_img, y_min_new_img, x_ma
         # if new object is too small
         if (width_obj_new * height_obj_new) < 100:
             continue
-        cv2.circle(crop, (x_center_obj_new, y_center_obj_new), 5, (0, 255, 0), 1)
+        # cv2.circle(crop, (x_center_obj_new, y_center_obj_new), 5, (0, 255, 0), 1)
         # cv2.imshow('Draw label of new obj', crop)
         # cv2.waitKey(0)
         # transfer size to rate
@@ -162,5 +166,5 @@ def save_file(directory, crop, img, filename, x_min_new_img, y_min_new_img, x_ma
 
 if __name__ == '__main__':
     folder = '/media/veec20/Data/duongdq/Yolo_mark/data/change_cor/'
-    # change_coordination()
+    change_coordination()
     draw_new_img(folder)
