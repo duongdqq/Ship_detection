@@ -113,7 +113,7 @@ def save_file(directory, crop, img, filename, x_min_new_img, y_min_new_img, x_ma
         elif x_max_new_img <= x_min_obj:  # Outside right
             x_center_obj_new = 0
             width_obj_new = 0
-        if x_min_obj < x_min_new_img < x_max_new_img < x_max_obj:  # obj cover new img
+        elif x_min_obj < x_min_new_img < x_max_new_img < x_max_obj:  # obj cover new img
             x_center_obj_new = int((x_max_new_img - x_min_new_img) / 2)
             width_obj_new = x_max_new_img - x_min_new_img
         else:
@@ -134,11 +134,12 @@ def save_file(directory, crop, img, filename, x_min_new_img, y_min_new_img, x_ma
         elif y_max_new_img <= y_min_obj:  # Outside bottom
             y_center_obj_new = 0
             height_obj_new = 0
+        elif y_min_obj < y_min_new_img < y_max_new_img < y_max_obj:  # obj cover new img
+            y_center_obj_new = int((y_max_new_img - y_min_new_img) / 2)
+            height_obj_new = y_max_new_img - y_min_new_img
         else:
             print('error y')
-        if y_min_obj < y_min_new_img < y_max_new_img < y_max_obj:  # obj cover new img
-            center_obj_new = int((y_max_new_img - y_min_new_img) / 2)
-            height_obj_new = y_max_new_img - y_min_new_img
+
         # if new object is too small
         if (width_obj_new * height_obj_new) < 100:
             continue
