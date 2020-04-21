@@ -36,18 +36,18 @@ def change_coordination():
         shutil.copy(os.path.join(folder_original, filename), directory)
 
 
-def draw_new_img(folder):
+def draw_new_img(folder_target):
     images = []
     crop_img = []
     dont_cut = 0
 
-    for filename in os.listdir(folder):
+    for filename in os.listdir(folder_target):
         if filename.endswith('.png') or filename.endswith('.jpeg') or filename.endswith('.JPG'):
             filename = filename.replace('.png', '.jpg')
             filename = filename.replace('.jpeg', '.jpg')
             filename = filename.replace('.JPG', '.jpg')
         txt_file = filename.replace('.jpg', '.txt')
-        img = cv2.imread(os.path.join(folder, filename))
+        img = cv2.imread(os.path.join(folder_target, filename))
         if img is not None:
             height, width, chanel = img.shape  # [height, width]
             print(img.shape)
@@ -57,11 +57,11 @@ def draw_new_img(folder):
                 dont_cut += 1
                 print('Do not cut: %i' % dont_cut)
                 print(filename)
-                shutil.copy(os.path.join(folder, filename), directory_target)
-                shutil.copy(os.path.join(folder, txt_file), directory_target)
+                shutil.copy(os.path.join(directory, filename), directory_target)
+                shutil.copy(os.path.join(folder_original, txt_file), directory_target)
                 continue
             else:
-                number = 6
+                number = 5
                 step = 20
                 x_min_limit = 480
                 y_min_limit = 270
@@ -89,9 +89,10 @@ def draw_new_img(folder):
 
 def save_file(crop, filename, x_min_new_img, y_min_new_img, x_max_new_img, y_max_new_img, index,
               txt_file):
-    f = open(os.path.join(folder, txt_file))
+    f = open(os.path.join(folder_target, txt_file))
     filename_new = filename.replace('.jpg', str(index) + '.jpg')
     txt_file_new = txt_file.replace('.txt', str(index) + '.txt')
+    os.chdir(directory_target)
     for line in f.readlines():
         line = line.rstrip('\n')
         # size of original obj
@@ -110,7 +111,7 @@ def save_file(crop, filename, x_min_new_img, y_min_new_img, x_max_new_img, y_max
         # cv2.waitKey(0)
 
         # size of new object on new image
-        if x_max_obj <= x_min_new_img:  # Outside left
+        if x_max_obj <= x_min_new_img:  # Outside left(
             x_center_obj_new = 0
             width_obj_new = 0
         elif x_min_obj <= x_min_new_img <= x_max_obj <= x_max_new_img:  # Inside left
@@ -148,7 +149,8 @@ def save_file(crop, filename, x_min_new_img, y_min_new_img, x_max_new_img, y_max
             y_center_obj_new = int((y_max_new_img - y_min_new_img) / 2)
             height_obj_new = y_max_new_img - y_min_new_img
         # if new object is too small
-        if width_obj_new < 100 or height_obj_new < 50:
+        if (width_obj_new < 50 and height_obj_new < 50) or width_obj_new * height_obj_new < (w_obj * h_obj * 0.1):
+            print('remove size is too small')
             with open(txt_file_new, 'a+') as file_empty:
                 file_empty.write('')
             cv2.imwrite(filename_new, crop)
@@ -169,17 +171,15 @@ def save_file(crop, filename, x_min_new_img, y_min_new_img, x_max_new_img, y_max
         y_center_obj_new /= 540
         width_obj_new /= 960
         height_obj_new /= 540
-        os.chdir(directory_target)
         cv2.imwrite(filename_new, crop)
         with open(txt_file_new, 'a+') as file:
-            file.write(
-                '%i %f %f %f %f\n' % (id_class, x_center_obj_new, y_center_obj_new, width_obj_new, height_obj_new))
+            file.write('%i %f %f %f %f\n' % (id_class, x_center_obj_new, y_center_obj_new, width_obj_new, height_obj_new))
 
 
 if __name__ == '__main__':
-    folder_original = '/media/veec20/Data/duongdq/Yolo_mark/data/USA_battleship/'
+    folder_original = '/media/veec20/Data/duongdq/Yolo_mark/data/SeaShips_7000_raw/'
     directory = '/media/veec20/Data/duongdq/Yolo_mark/data/change_cor/'
-    folder = '/media/veec20/Data/duongdq/Yolo_mark/data/change_cor/'
-    directory_target = '/media/veec20/Data/duongdq/Yolo_mark/data/USA_battleship_cut/'
-    change_coordination()
-    draw_new_img(folder)
+    folder_target = '/media/veec20/Data/duongdq/Yolo_mark/data/change_cor/'
+    directory_target = '/media/veec20/Data/duongdq/Yolo_mark/data/test_cut/'
+    # change_coordination()
+    draw_new_img(folder_target)
